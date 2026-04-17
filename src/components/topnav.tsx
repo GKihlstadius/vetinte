@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export function Topnav() {
   return (
-    <nav className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-30 w-full bg-transparent">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-4">
         <Link
           href="/"

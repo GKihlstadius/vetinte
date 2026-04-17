@@ -1,5 +1,6 @@
 import type { LLMProvider } from './types';
 import { createGeminiProvider } from './gemini';
+import { createGroqProvider } from './groq';
 
 let cached: LLMProvider | null = null;
 
@@ -9,6 +10,9 @@ export function getLLMProvider(): LLMProvider {
   switch (name) {
     case 'gemini':
       cached = createGeminiProvider();
+      return cached;
+    case 'groq':
+      cached = createGroqProvider();
       return cached;
     default:
       throw new Error(`Unknown LLM provider: ${name}`);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Topnav } from '@/components/topnav';
 import { ChatView } from '@/components/chat-view';
 import { ProductCard, type ProductCardProps } from '@/components/product-card';
@@ -82,9 +82,6 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,0.06),transparent_40%)]" />
       <div className="relative mx-auto max-w-5xl px-6 py-20 md:py-28">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 backdrop-blur">
-            <Sparkles size={12} /> Transparent produktrekommendation
-          </span>
           <div className="space-y-5">
             <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 md:text-6xl">
               Hörlurar som faktiskt passar dig.

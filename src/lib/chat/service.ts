@@ -38,11 +38,16 @@ export async function generateChatResponse(
     maxTokens: 8192,
   });
 
+  const modelByProvider: Record<string, string> = {
+    gemini: 'gemini-flash-latest',
+    groq: 'llama-3.3-70b-versatile',
+  };
+
   return {
     response: result.parsed as ChatResponse,
     usage: result.usage,
     provider: llm.name,
-    model: 'gemini-flash-latest',
+    model: modelByProvider[llm.name] ?? llm.name,
     latencyMs: Date.now() - start,
     ragChunksUsed: chunks.length,
   };
