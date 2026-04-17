@@ -39,3 +39,27 @@ describe('review_chunks table', () => {
     expect(error).toBeNull();
   });
 });
+
+describe('affiliate_links table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('affiliate_links')
+      .select(
+        'id, product_id, retailer, url_template, network, currency, region, price_current, last_checked_at'
+      )
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
+
+describe('affiliate_clicks table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('affiliate_clicks')
+      .select(
+        'id, user_id, session_id, product_id, affiliate_link_id, ip_hash, user_agent, referer, clicked_at'
+      )
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
