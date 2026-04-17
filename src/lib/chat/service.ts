@@ -35,7 +35,7 @@ export async function generateChatResponse(
     ],
     responseSchema: RESPONSE_SCHEMA,
     temperature: 0.4,
-    maxTokens: 2048,
+    maxTokens: 8192,
   });
 
   return {
