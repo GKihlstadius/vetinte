@@ -1,0 +1,57 @@
+[
+  {
+    "slug": "sony-wh-1000xm5",
+    "brand": "Sony",
+    "model": "WH-1000XM5",
+    "category": "over-ear",
+    "summary_sv": "Sonys flaggskepp med branschledande ANC, 30 timmars batteritid och bekväm passform för långa lyssningssessioner.",
+    "summary_en": "Sony's flagship with industry-leading ANC, 30 hours battery and a comfortable fit for long listening sessions.",
+    "specs_json": {"anc": true, "battery_h": 30, "weight_g": 250, "bluetooth": "5.2", "codecs": ["LDAC", "AAC", "SBC"]},
+    "image_url": "https://example.com/xm5.jpg",
+    "editorial_notes": "Bäst i test hos M3 och Ljud & Bild 2025-2026."
+  },
+  {
+    "slug": "bose-quietcomfort-ultra",
+    "brand": "Bose",
+    "model": "QuietComfort Ultra",
+    "category": "over-ear",
+    "summary_sv": "Bose QC Ultra prioriterar komfort och ljudmiljö, med marknadens bekvämaste passform.",
+    "summary_en": "Bose QC Ultra prioritises comfort and sound staging with arguably the most comfortable fit on the market.",
+    "specs_json": {"anc": true, "battery_h": 24, "weight_g": 254, "bluetooth": "5.3", "codecs": ["aptX Adaptive", "AAC"]},
+    "image_url": "https://example.com/qc-ultra.jpg",
+    "editorial_notes": ""
+  },
+  {
+    "slug": "sennheiser-momentum-4",
+    "brand": "Sennheiser",
+    "model": "Momentum 4",
+    "category": "over-ear",
+    "summary_sv": "Sennheiser Momentum 4 har 60 timmars batteritid och ett raffinerat ljud som många testare kallar branschbäst.",
+    "summary_en": "Sennheiser Momentum 4 has 60 hours of battery life and refined sound that many reviewers call best in class.",
+    "specs_json": {"anc": true, "battery_h": 60, "weight_g": 293, "bluetooth": "5.2", "codecs": ["aptX Adaptive", "AAC"]},
+    "image_url": "https://example.com/momentum4.jpg",
+    "editorial_notes": ""
+  },
+  {
+    "slug": "apple-airpods-pro-2",
+    "brand": "Apple",
+    "model": "AirPods Pro 2",
+    "category": "true-wireless",
+    "summary_sv": "Apples in-ear med stark ANC, transparensläge och djup iOS-integration.",
+    "summary_en": "Apple in-ear with strong ANC, transparency mode and deep iOS integration.",
+    "specs_json": {"anc": true, "battery_h": 6, "weight_g": 5, "bluetooth": "5.3", "codecs": ["AAC"]},
+    "image_url": "https://example.com/airpods-pro2.jpg",
+    "editorial_notes": ""
+  },
+  {
+    "slug": "sony-wf-1000xm5",
+    "brand": "Sony",
+    "model": "WF-1000XM5",
+    "category": "true-wireless",
+    "summary_sv": "Sony WF-1000XM5 är små, bekväma och har mycket stark ANC för in-ear.",
+    "summary_en": "Sony WF-1000XM5 are small, comfortable and have very strong ANC for in-ear.",
+    "specs_json": {"anc": true, "battery_h": 8, "weight_g": 6, "bluetooth": "5.3", "codecs": ["LDAC", "AAC"]},
+    "image_url": "https://example.com/wf-xm5.jpg",
+    "editorial_notes": ""
+  }
+]
