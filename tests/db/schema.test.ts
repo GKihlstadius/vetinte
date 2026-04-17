@@ -17,3 +17,25 @@ describe('products table', () => {
     expect(error).toBeNull();
   });
 });
+
+describe('review_sources table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('review_sources')
+      .select(
+        'id, product_id, source_type, publisher, url, title, published_at, rating_normalized, raw_text'
+      )
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
+
+describe('review_chunks table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('review_chunks')
+      .select('id, source_id, product_id, chunk_text, embedding')
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
