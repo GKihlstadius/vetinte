@@ -15,15 +15,17 @@ interface Turn {
 
 interface ChatViewProps {
   initialMessage?: string;
+  loadSessionId?: string;
 }
 
-export function ChatView({ initialMessage }: ChatViewProps) {
+export function ChatView({ initialMessage, loadSessionId }: ChatViewProps) {
   const [input, setInput] = useState('');
   const [turns, setTurns] = useState<Turn[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasSentInitial = useRef(false);
+  const loadedSessionRef = useRef<string | undefined>(undefined);
 
   async function send(message?: string) {
     const text = (message ?? input).trim();
@@ -72,6 +74,26 @@ export function ChatView({ initialMessage }: ChatViewProps) {
       send(initialMessage);
     }
   }, [initialMessage]);
+
+  useEffect(() => {
+    if (!loadSessionId || loadedSessionRef.current === loadSessionId) return;
+    loadedSessionRef.current = loadSessionId;
+    fetch(`/api/sessions/${loadSessionId}`)
+      .then((r) => r.json())
+      .then(({ messages }: { messages: { role: 'user' | 'assistant'; content_md: string; cards_json: unknown[] | null }[] }) => {
+        if (!messages) return;
+        const historic: Turn[] = messages.map((m) => ({
+          role: m.role,
+          intro: m.content_md,
+          blocks: Array.isArray(m.cards_json) ? m.cards_json : [],
+          outro: '',
+          followups: [],
+        }));
+        setTurns(historic);
+        setSessionId(loadSessionId);
+      })
+      .catch(() => {});
+  }, [loadSessionId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });

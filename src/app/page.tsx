@@ -9,17 +9,35 @@ import { ProductCard, type ProductCardProps } from '@/components/product-card';
 export default function HomePage() {
   const [started, setStarted] = useState(false);
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
+  const [loadSessionId, setLoadSessionId] = useState<string | undefined>();
 
   function startWith(message: string) {
     setInitialMessage(message);
+    setLoadSessionId(undefined);
     setStarted(true);
+  }
+
+  function openSession(id: string) {
+    setInitialMessage(undefined);
+    setLoadSessionId(id);
+    setStarted(true);
+  }
+
+  function newChat() {
+    setInitialMessage(undefined);
+    setLoadSessionId(undefined);
+    setStarted(false);
   }
 
   return (
     <>
-      <Topnav />
+      <Topnav onSelectSession={openSession} onNew={started ? newChat : undefined} />
       {started ? (
-        <ChatView initialMessage={initialMessage} />
+        <ChatView
+          key={loadSessionId ?? initialMessage ?? 'new'}
+          initialMessage={initialMessage}
+          loadSessionId={loadSessionId}
+        />
       ) : (
         <Landing onStart={startWith} />
       )}
