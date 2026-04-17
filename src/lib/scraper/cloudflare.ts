@@ -83,18 +83,30 @@ export async function crawlAndWait(options: CrawlOptions): Promise<CrawledPage[]
   throw new Error('Crawl timed out');
 }
 
-export async function renderPage(url: string): Promise<string> {
+export interface RenderOptions {
+  forceCF?: boolean;
+  waitFor?: string;
+}
+
+export async function renderPage(url: string, options: RenderOptions = {}): Promise<string> {
+  if (options.forceCF) {
+    const cfHtml = await renderWithCF(url, options.waitFor);
+    if (!cfHtml) throw new Error(`CF render failed for ${url}`);
+    return cfHtml;
+  }
   try {
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BetygetBot/1.0)' },
       signal: AbortSignal.timeout(15_000),
     });
     const html = await res.text();
-    if (html.length > 5000 && html.includes('</')) return html;
-    const cfHtml = await renderWithCF(url);
+    const looksLikeSPA =
+      html.includes('var GLOBALS =') || html.length < 5000 || !html.includes('</p>');
+    if (!looksLikeSPA) return html;
+    const cfHtml = await renderWithCF(url, options.waitFor);
     return cfHtml || html;
   } catch {
-    const cfHtml = await renderWithCF(url);
+    const cfHtml = await renderWithCF(url, options.waitFor);
     if (cfHtml) return cfHtml;
     throw new Error(`Failed to fetch ${url}`);
   }
