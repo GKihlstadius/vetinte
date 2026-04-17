@@ -400,6 +400,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      increment_llm_usage: {
+        Args: {
+          p_completion_tokens: number
+          p_day: string
+          p_model: string
+          p_prompt_tokens: number
+          p_provider: string
+          p_requests: number
+        }
+        Returns: undefined
+      }
       match_review_chunks: {
         Args: { match_limit?: number; query_embedding: string }
         Returns: {

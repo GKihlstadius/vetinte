@@ -1,10 +1,38 @@
 import { getLLMProvider } from '@/lib/llm/provider';
-import { retrieveProductsAndChunks } from '@/lib/rag/retrieve';
+import { retrieveProductsAndChunks, type RetrievedChunk } from '@/lib/rag/retrieve';
 import { getMemoryFacts, addMessages } from '@/lib/memory';
 import { resolvePrimaryLink } from '@/lib/affiliate/resolve';
+import { trackUsage } from '@/lib/llm/usage';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
 import { RESPONSE_SCHEMA, type ChatResponse, type ChatBlock } from './schema';
 import type { LLMMessage } from '@/lib/llm/types';
+
+const LONG_TAIL_SIMILARITY_THRESHOLD = 0.6;
+
+async function logLongTailMiss(
+  userId: string | null,
+  query: string,
+  chunks: RetrievedChunk[]
+): Promise<void> {
+  if (chunks.length === 0 || averageSimilarity(chunks) >= LONG_TAIL_SIMILARITY_THRESHOLD) {
+    if (chunks.length > 0) return;
+  }
+  try {
+    const db = createAdminClient();
+    await db.from('long_tail_misses').insert({
+      user_id: userId,
+      query_text: query,
+    });
+  } catch {
+    // best-effort
+  }
+}
+
+function averageSimilarity(chunks: RetrievedChunk[]): number {
+  if (chunks.length === 0) return 0;
+  return chunks.reduce((sum, c) => sum + c.similarity, 0) / chunks.length;
+}
 
 export interface GenerateChatParams {
   userMessage: string;
@@ -92,6 +120,10 @@ export async function generateChatResponse(
     gemini: 'gemini-flash-latest',
     groq: 'llama-3.3-70b-versatile',
   };
+  const modelName = modelByProvider[llm.name] ?? llm.name;
+
+  trackUsage(llm.name, modelName, result.usage).catch(() => {});
+  logLongTailMiss(userId, params.userMessage, chunks).catch(() => {});
 
   return {
     response: enrichedResponse,
