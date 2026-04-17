@@ -1,0 +1,32 @@
+[
+  {
+    "id": "pendling-3000",
+    "query": "Vilka hörlurar är bäst för tågpendling, budget 3000 kr?",
+    "locale": "sv",
+    "expect": {
+      "min_products": 2,
+      "must_include_any_of": [
+        "sony-wh-1000xm5",
+        "bose-quietcomfort-ultra",
+        "sennheiser-momentum-4"
+      ]
+    }
+  },
+  {
+    "id": "compare-xm5-qc",
+    "query": "Jämför Sony XM5 och Bose QC Ultra.",
+    "locale": "sv",
+    "expect": {
+      "block_types": ["comparison_table", "product_card"]
+    }
+  },
+  {
+    "id": "true-wireless-ios",
+    "query": "Bästa true-wireless för iPhone?",
+    "locale": "sv",
+    "expect": {
+      "min_products": 1,
+      "must_include_any_of": ["apple-airpods-pro-2", "sony-wf-1000xm5"]
+    }
+  }
+]
