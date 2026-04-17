@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "seed": "tsx scripts/seed-products.ts",
+    "seed:affiliate": "tsx scripts/seed-affiliate-links.ts",
     "ingest": "tsx scripts/ingest.ts"
   },
   "dependencies": {

@@ -1,0 +1,47 @@
+[
+  {
+    "product_slug": "sony-wh-1000xm5",
+    "retailer": "Webhallen",
+    "url_template": "https://www.webhallen.com/se/search?query=sony+wh-1000xm5",
+    "network": "direct",
+    "currency": "SEK",
+    "region": "SE",
+    "price_current": 3490
+  },
+  {
+    "product_slug": "bose-quietcomfort-ultra",
+    "retailer": "Webhallen",
+    "url_template": "https://www.webhallen.com/se/search?query=bose+quietcomfort+ultra",
+    "network": "direct",
+    "currency": "SEK",
+    "region": "SE",
+    "price_current": 4290
+  },
+  {
+    "product_slug": "sennheiser-momentum-4",
+    "retailer": "Webhallen",
+    "url_template": "https://www.webhallen.com/se/search?query=sennheiser+momentum+4",
+    "network": "direct",
+    "currency": "SEK",
+    "region": "SE",
+    "price_current": 2990
+  },
+  {
+    "product_slug": "apple-airpods-pro-2",
+    "retailer": "Apple SE",
+    "url_template": "https://www.apple.com/se/shop/buy-airpods/airpods-pro",
+    "network": "direct",
+    "currency": "SEK",
+    "region": "SE",
+    "price_current": 2995
+  },
+  {
+    "product_slug": "sony-wf-1000xm5",
+    "retailer": "Webhallen",
+    "url_template": "https://www.webhallen.com/se/search?query=sony+wf-1000xm5",
+    "network": "direct",
+    "currency": "SEK",
+    "region": "SE",
+    "price_current": 2990
+  }
+]
