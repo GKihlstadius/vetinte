@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
         const result = await generateChatResponse({
           userMessage: message,
-          userFacts: [],
+          userId,
           recentMessages: [],
           locale: locale === 'en' ? 'en' : 'sv',
         });
