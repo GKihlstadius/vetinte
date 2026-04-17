@@ -1,8 +1,9 @@
 import { getLLMProvider } from '@/lib/llm/provider';
 import { retrieveProductsAndChunks } from '@/lib/rag/retrieve';
 import { getMemoryFacts, addMessages } from '@/lib/memory';
+import { resolvePrimaryLink } from '@/lib/affiliate/resolve';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
-import { RESPONSE_SCHEMA, type ChatResponse } from './schema';
+import { RESPONSE_SCHEMA, type ChatResponse, type ChatBlock } from './schema';
 import type { LLMMessage } from '@/lib/llm/types';
 
 export interface GenerateChatParams {
@@ -56,11 +57,32 @@ export async function generateChatResponse(
     maxTokens: 8192,
   });
 
+  const parsed = result.parsed as ChatResponse | undefined;
+  const region = params.locale === 'sv' ? 'SE' : 'EN';
+  const enrichedBlocks: ChatBlock[] = parsed
+    ? await Promise.all(
+        (parsed.blocks ?? []).map(async (b): Promise<ChatBlock> => {
+          if (b.type === 'product_card') {
+            const link = await resolvePrimaryLink(b.product_id, region);
+            return { ...b, affiliate_link_id: link?.id };
+          }
+          if (b.type === 'comparison_table') {
+            const links = await Promise.all(
+              b.product_ids.map((slug) => resolvePrimaryLink(slug, region))
+            );
+            return { ...b, affiliate_link_ids: links.map((l) => l?.id ?? '') };
+          }
+          return b;
+        })
+      )
+    : [];
+
+  const enrichedResponse: ChatResponse = parsed
+    ? { ...parsed, blocks: enrichedBlocks }
+    : ({ intro_md: '', blocks: [], outro_md: '', followup_suggestions: [] } as ChatResponse);
+
   if (userId) {
-    const assistantText = [
-      (result.parsed as ChatResponse)?.intro_md,
-      (result.parsed as ChatResponse)?.outro_md,
-    ]
+    const assistantText = [enrichedResponse.intro_md, enrichedResponse.outro_md]
       .filter(Boolean)
       .join('\n\n');
     addMessages(userId, params.userMessage, assistantText).catch(() => {});
@@ -72,7 +94,7 @@ export async function generateChatResponse(
   };
 
   return {
-    response: result.parsed as ChatResponse,
+    response: enrichedResponse,
     usage: result.usage,
     provider: llm.name,
     model: modelByProvider[llm.name] ?? llm.name,

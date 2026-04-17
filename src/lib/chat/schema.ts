@@ -34,7 +34,12 @@ export interface ChatResponse {
 }
 
 export type ChatBlock =
-  | { type: 'product_card'; product_id: string; angle: string }
-  | { type: 'comparison_table'; product_ids: string[]; columns: string[] }
+  | { type: 'product_card'; product_id: string; angle: string; affiliate_link_id?: string }
+  | {
+      type: 'comparison_table';
+      product_ids: string[];
+      columns: string[];
+      affiliate_link_ids?: string[];
+    }
   | { type: 'video'; youtube_id: string; caption: string }
   | { type: 'quote'; text: string; source: string };

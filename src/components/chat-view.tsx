@@ -157,6 +157,7 @@ function TurnBubble({ turn, onFollowup }: { turn: Turn; onFollowup: (msg: string
               type: string;
               product_id?: string;
               angle?: string;
+              affiliate_link_id?: string;
               text?: string;
               source?: string;
             };
@@ -167,6 +168,7 @@ function TurnBubble({ turn, onFollowup }: { turn: Turn; onFollowup: (msg: string
                   slug={block.product_id}
                   angle={block.angle}
                   isWinner={i === 0}
+                  affiliateLinkId={block.affiliate_link_id}
                 />
               );
             }
@@ -212,10 +214,12 @@ function ProductCardFromSlug({
   slug,
   angle,
   isWinner,
+  affiliateLinkId,
 }: {
   slug: string;
   angle?: string;
   isWinner?: boolean;
+  affiliateLinkId?: string;
 }) {
   const [product, setProduct] = useState<ProductCardProps | null>(null);
   useEffect(() => {
@@ -239,10 +243,10 @@ function ProductCardFromSlug({
           image_url: p.image_url,
           is_winner: isWinner,
           angle,
-          affiliate_link_id: null,
+          affiliate_link_id: affiliateLinkId ?? null,
         });
       });
-  }, [slug, angle, isWinner]);
+  }, [slug, angle, isWinner, affiliateLinkId]);
   if (!product) return <div className="h-48 animate-pulse rounded-xl bg-zinc-100" />;
   return <ProductCard {...product} />;
 }
