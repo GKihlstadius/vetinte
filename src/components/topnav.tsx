@@ -32,7 +32,7 @@ export function Topnav({ onSelectSession, onNew }: TopnavProps) {
 
   return (
     <>
-      <nav className="sticky top-0 z-30 w-full bg-transparent">
+      <nav className="relative z-30 w-full bg-transparent">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-4">
           <Link
             href="/"
