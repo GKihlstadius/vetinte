@@ -13,13 +13,19 @@ export interface RetrievedProduct {
   editorial_notes: string | null;
 }
 
+function sanitizeForIlike(s: string): string {
+  return s.replace(/[,()%*]/g, ' ').trim();
+}
+
 export async function retrieveProducts(query: string, limit = 5): Promise<RetrievedProduct[]> {
   const supabase = createAdminClient();
   const qb = supabase.from('products').select('*');
-  const { data, error } = query
+  const q = sanitizeForIlike(query);
+  const isShortKeyword = q.length > 0 && q.split(/\s+/).length <= 2;
+  const { data, error } = isShortKeyword
     ? await qb
         .or(
-          `brand.ilike.%${query}%,model.ilike.%${query}%,summary_sv.ilike.%${query}%,summary_en.ilike.%${query}%`
+          `brand.ilike.%${q}%,model.ilike.%${q}%,summary_sv.ilike.%${q}%,summary_en.ilike.%${q}%`
         )
         .limit(limit)
     : await qb.limit(limit);
