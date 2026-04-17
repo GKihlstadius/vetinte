@@ -63,3 +63,55 @@ describe('affiliate_clicks table', () => {
     expect(error).toBeNull();
   });
 });
+
+describe('chat_sessions table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('chat_sessions')
+      .select('id, user_id, title, created_at')
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
+
+describe('chat_messages table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('chat_messages')
+      .select(
+        'id, session_id, role, content_md, cards_json, llm_provider, llm_model, latency_ms, prompt_tokens, completion_tokens, rag_chunks_used'
+      )
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
+
+describe('user_memory table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('user_memory')
+      .select('user_id, key, value_text, updated_at')
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
+
+describe('long_tail_misses table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('long_tail_misses')
+      .select('id, user_id, session_id, query_text, detected_product_hint, created_at')
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
+
+describe('llm_usage table', () => {
+  it('has expected columns', async () => {
+    const { error } = await supabase
+      .from('llm_usage')
+      .select('day, provider, model, request_count, prompt_tokens, completion_tokens')
+      .limit(0);
+    expect(error).toBeNull();
+  });
+});
