@@ -1,4 +1,5 @@
 export interface SSEHandlers {
+  onSession?: (sessionId: string) => void;
   onIntroToken?: (token: string) => void;
   onBlocks?: (blocks: unknown[]) => void;
   onOutro?: (outro: string, followups: string[]) => void;
@@ -9,12 +10,13 @@ export interface SSEHandlers {
 export async function streamChat(
   message: string,
   locale: 'sv' | 'en',
-  handlers: SSEHandlers
+  handlers: SSEHandlers,
+  sessionId?: string
 ) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ message, locale }),
+    body: JSON.stringify({ message, locale, sessionId }),
   });
   if (!res.ok || !res.body) {
     handlers.onError?.('Request failed');
@@ -36,7 +38,8 @@ export async function streamChat(
       if (!eventLine || !dataLine) continue;
       const event = eventLine.slice('event: '.length);
       const data = JSON.parse(dataLine.slice('data: '.length));
-      if (event === 'intro') handlers.onIntroToken?.(data.token);
+      if (event === 'session') handlers.onSession?.(data.session_id);
+      else if (event === 'intro') handlers.onIntroToken?.(data.token);
       else if (event === 'blocks') handlers.onBlocks?.(data.blocks);
       else if (event === 'outro') handlers.onOutro?.(data.outro_md, data.followup_suggestions);
       else if (event === 'done') handlers.onDone?.();

@@ -21,6 +21,7 @@ export function ChatView({ initialMessage }: ChatViewProps) {
   const [input, setInput] = useState('');
   const [turns, setTurns] = useState<Turn[]>([]);
   const [streaming, setStreaming] = useState(false);
+  const [sessionId, setSessionId] = useState<string | undefined>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasSentInitial = useRef(false);
 
@@ -32,8 +33,12 @@ export function ChatView({ initialMessage }: ChatViewProps) {
     setTurns((t) => [...t, userTurn, botTurn]);
     setInput('');
     setStreaming(true);
-    await streamChat(text, 'sv', {
-      onIntroToken: (tok) =>
+    await streamChat(
+      text,
+      'sv',
+      {
+        onSession: (id) => setSessionId(id),
+        onIntroToken: (tok) =>
         setTurns((t) => {
           const updated = [...t];
           updated[updated.length - 1] = {
@@ -54,9 +59,11 @@ export function ChatView({ initialMessage }: ChatViewProps) {
           updated[updated.length - 1] = { ...updated[updated.length - 1], outro, followups };
           return updated;
         }),
-      onDone: () => setStreaming(false),
-      onError: () => setStreaming(false),
-    });
+        onDone: () => setStreaming(false),
+        onError: () => setStreaming(false),
+      },
+      sessionId
+    );
   }
 
   useEffect(() => {
