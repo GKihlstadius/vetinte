@@ -11,6 +11,16 @@ export default function HomePage() {
   const [initialMessage, setInitialMessage] = useState<string | undefined>();
   const [loadSessionId, setLoadSessionId] = useState<string | undefined>();
 
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('error=')) {
+      const params = new URLSearchParams(hash.slice(1));
+      const desc = params.get('error_description');
+      history.replaceState(null, '', window.location.pathname);
+      window.location.href = `/sign-in?error_description=${encodeURIComponent(desc ?? 'sign-in failed')}`;
+    }
+  }, []);
+
   function startWith(message: string) {
     setInitialMessage(message);
     setLoadSessionId(undefined);

@@ -1,18 +1,35 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createBrowserSupabase } from '@/lib/supabase/browser';
 
+type Stage = 'email' | 'code';
+
 export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInForm />
+    </Suspense>
+  );
+}
+
+function SignInForm() {
   const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [code, setCode] = useState('');
+  const [stage, setStage] = useState<Stage>('email');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const supabase = createBrowserSupabase();
   const router = useRouter();
+  const params = useSearchParams();
+
+  useEffect(() => {
+    const err = params.get('error_description');
+    if (err) setError(err.replace(/\+/g, ' '));
+  }, [params]);
 
   async function signInWithGoogle() {
     setLoading(true);
@@ -27,7 +44,7 @@ export default function SignInPage() {
     }
   }
 
-  async function signInWithEmail(e: React.FormEvent) {
+  async function sendCode(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
@@ -38,7 +55,25 @@ export default function SignInPage() {
     });
     setLoading(false);
     if (error) setError(error.message);
-    else setSent(true);
+    else setStage('code');
+  }
+
+  async function verifyCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!code.trim()) return;
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: code.trim(),
+      type: 'email',
+    });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push('/');
+    }
   }
 
   return (
@@ -63,7 +98,7 @@ export default function SignInPage() {
           <button
             type="button"
             onClick={signInWithGoogle}
-            disabled={loading || sent}
+            disabled={loading || stage === 'code'}
             className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <GoogleIcon />
@@ -76,12 +111,8 @@ export default function SignInPage() {
             <span className="h-px flex-1 bg-zinc-200" />
           </div>
 
-          {sent ? (
-            <p className="rounded-lg border border-deep-100 bg-deep-50 px-4 py-3 text-sm text-deep-700">
-              Kolla din e-post, {email}. Klicka länken för att logga in.
-            </p>
-          ) : (
-            <form onSubmit={signInWithEmail} className="space-y-3">
+          {stage === 'email' && (
+            <form onSubmit={sendCode} className="space-y-3">
               <input
                 type="email"
                 value={email}
@@ -96,7 +127,45 @@ export default function SignInPage() {
                 disabled={loading || !email.trim()}
                 className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-zinc-900 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
               >
-                {loading ? 'Skickar...' : 'Skicka magisk länk'}
+                {loading ? 'Skickar...' : 'Skicka kod eller länk'}
+              </button>
+            </form>
+          )}
+
+          {stage === 'code' && (
+            <form onSubmit={verifyCode} className="space-y-3">
+              <p className="text-sm text-zinc-600">
+                Kolla <strong>{email}</strong>. Klicka länken, eller klistra in 6-siffrig kod här.
+              </p>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="123456"
+                autoFocus
+                disabled={loading}
+                className="h-11 w-full rounded-lg border border-zinc-200 bg-white px-4 font-mono text-base tracking-[0.3em] text-zinc-900 placeholder:text-zinc-300 focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200 disabled:opacity-60"
+              />
+              <button
+                type="submit"
+                disabled={loading || code.length < 6}
+                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-zinc-900 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+              >
+                {loading ? 'Verifierar...' : 'Logga in'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setStage('email');
+                  setCode('');
+                  setError(null);
+                }}
+                className="block w-full text-xs text-zinc-500 transition-colors hover:text-zinc-900"
+              >
+                Använd annan e-post
               </button>
             </form>
           )}
