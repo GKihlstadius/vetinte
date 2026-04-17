@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { embed } from '@/lib/llm/embeddings';
 
 export interface RetrievedProduct {
   id: string;
@@ -13,22 +14,55 @@ export interface RetrievedProduct {
   editorial_notes: string | null;
 }
 
-function sanitizeForIlike(s: string): string {
-  return s.replace(/[,()%*]/g, ' ').trim();
+export interface RetrievedChunk {
+  id: string;
+  product_id: string;
+  chunk_text: string;
+  similarity: number;
 }
 
-export async function retrieveProducts(query: string, limit = 5): Promise<RetrievedProduct[]> {
+export async function retrieveProductsAndChunks(
+  query: string,
+  topK = 10
+): Promise<{ products: RetrievedProduct[]; chunks: RetrievedChunk[] }> {
   const supabase = createAdminClient();
-  const qb = supabase.from('products').select('*');
-  const q = sanitizeForIlike(query);
-  const isShortKeyword = q.length > 0 && q.split(/\s+/).length <= 2;
-  const { data, error } = isShortKeyword
-    ? await qb
-        .or(
-          `brand.ilike.%${q}%,model.ilike.%${q}%,summary_sv.ilike.%${q}%,summary_en.ilike.%${q}%`
-        )
-        .limit(limit)
-    : await qb.limit(limit);
-  if (error) throw error;
-  return (data ?? []) as RetrievedProduct[];
+  let queryEmbedding: number[] = [];
+  try {
+    queryEmbedding = await embed(query);
+  } catch {
+    queryEmbedding = [];
+  }
+
+  let chunks: RetrievedChunk[] = [];
+  if (queryEmbedding.length > 0) {
+    const { data, error } = await supabase.rpc('match_review_chunks', {
+      query_embedding: queryEmbedding as unknown as string,
+      match_limit: topK,
+    });
+    if (!error && data) chunks = data as RetrievedChunk[];
+  }
+
+  const productIds = [...new Set(chunks.map((c) => c.product_id))];
+
+  if (productIds.length === 0) {
+    const { data } = await supabase.from('products').select('*').limit(topK);
+    return { products: (data ?? []) as RetrievedProduct[], chunks: [] };
+  }
+
+  const { data: products } = await supabase
+    .from('products')
+    .select('*')
+    .in('id', productIds);
+
+  const productOrder = new Map(productIds.map((id, i) => [id, i]));
+  const orderedProducts = (products ?? []).sort(
+    (a, b) => (productOrder.get(a.id) ?? 0) - (productOrder.get(b.id) ?? 0)
+  );
+
+  return { products: orderedProducts as RetrievedProduct[], chunks };
+}
+
+export async function retrieveProducts(query: string, limit = 10): Promise<RetrievedProduct[]> {
+  const result = await retrieveProductsAndChunks(query, limit);
+  return result.products;
 }

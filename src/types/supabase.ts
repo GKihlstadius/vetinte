@@ -400,7 +400,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      match_review_chunks: {
+        Args: { match_limit?: number; query_embedding: string }
+        Returns: {
+          chunk_text: string
+          id: string
+          product_id: string
+          similarity: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

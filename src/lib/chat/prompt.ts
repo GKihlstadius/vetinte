@@ -1,9 +1,10 @@
-import type { RetrievedProduct } from '@/lib/rag/retrieve';
+import type { RetrievedProduct, RetrievedChunk } from '@/lib/rag/retrieve';
 import type { LLMMessage } from '@/lib/llm/types';
 
 export interface BuildPromptParams {
   userMessage: string;
   products: RetrievedProduct[];
+  chunks?: RetrievedChunk[];
   userFacts: string[];
   recentMessages: LLMMessage[];
   locale: 'sv' | 'en';
@@ -32,7 +33,7 @@ If the user asks about a product not in the list, be honest that you do not have
 }
 
 export function buildUserPrompt(params: BuildPromptParams): string {
-  const { userMessage, products, userFacts, recentMessages, locale } = params;
+  const { userMessage, products, chunks, userFacts, recentMessages, locale } = params;
   const lines: string[] = [];
 
   if (userFacts.length > 0) {
@@ -50,6 +51,21 @@ export function buildUserPrompt(params: BuildPromptParams): string {
     );
   }
   lines.push('');
+
+  if (chunks && chunks.length > 0) {
+    lines.push(locale === 'sv' ? 'RELEVANT EVIDENS FRÅN TESTER:' : 'RELEVANT TEST EVIDENCE:');
+    const byProduct = new Map<string, string[]>();
+    for (const c of chunks.slice(0, 8)) {
+      if (!byProduct.has(c.product_id)) byProduct.set(c.product_id, []);
+      byProduct.get(c.product_id)!.push(c.chunk_text.slice(0, 500));
+    }
+    for (const [productId, texts] of byProduct) {
+      const p = products.find((pp) => pp.id === productId);
+      const label = p ? `${p.brand} ${p.model}` : productId;
+      for (const t of texts) lines.push(`- [${label}] ${t}`);
+    }
+    lines.push('');
+  }
 
   if (recentMessages.length > 0) {
     lines.push(locale === 'sv' ? 'SENASTE SAMTALET:' : 'RECENT CONVERSATION:');

@@ -1,5 +1,5 @@
 import { getLLMProvider } from '@/lib/llm/provider';
-import { retrieveProducts } from '@/lib/rag/retrieve';
+import { retrieveProductsAndChunks } from '@/lib/rag/retrieve';
 import { buildSystemPrompt, buildUserPrompt } from './prompt';
 import { RESPONSE_SCHEMA, type ChatResponse } from './schema';
 import type { LLMMessage } from '@/lib/llm/types';
@@ -24,14 +24,14 @@ export async function generateChatResponse(
   params: GenerateChatParams
 ): Promise<GenerateChatResult> {
   const start = Date.now();
-  const products = await retrieveProducts(params.userMessage, 10);
+  const { products, chunks } = await retrieveProductsAndChunks(params.userMessage, 10);
 
   const llm = getLLMProvider();
   const result = await llm.generate({
     system: buildSystemPrompt({ locale: params.locale }),
     messages: [
       ...params.recentMessages,
-      { role: 'user', content: buildUserPrompt({ ...params, products }) },
+      { role: 'user', content: buildUserPrompt({ ...params, products, chunks }) },
     ],
     responseSchema: RESPONSE_SCHEMA,
     temperature: 0.4,
@@ -44,6 +44,6 @@ export async function generateChatResponse(
     provider: llm.name,
     model: 'gemini-flash-latest',
     latencyMs: Date.now() - start,
-    ragChunksUsed: products.length,
+    ragChunksUsed: chunks.length,
   };
 }
