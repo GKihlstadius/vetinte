@@ -3,7 +3,7 @@ import path from 'node:path';
 
 export default defineConfig({
   test: {
-    environment: 'node',
+    environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
     testTimeout: 30000,
   },

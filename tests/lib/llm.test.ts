@@ -14,7 +14,7 @@ describe('LLM provider', () => {
     const result = await provider.generate({
       system: 'Du är en hjälpsam assistent.',
       messages: [{ role: 'user', content: 'Säg hej på svenska.' }],
-      maxTokens: 50,
+      maxTokens: 400,
     });
     expect(result.text.length).toBeGreaterThan(0);
     expect(result.usage.completionTokens).toBeGreaterThan(0);
