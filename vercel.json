@@ -1,4 +1,7 @@
 {
   "framework": "nextjs",
-  "regions": ["arn1"]
+  "regions": ["arn1"],
+  "crons": [
+    { "path": "/api/cron/scrape-reviews", "schedule": "0 3 * * 0" }
+  ]
 }
