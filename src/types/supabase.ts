@@ -240,6 +240,51 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          id: string
+          username: string | null
+          display_name: string | null
+          avatar_url: string | null
+          bio: string | null
+          ai_tone: string
+          preferences_json: Json
+          review_count: number
+          trust_score: number
+          onboarded_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          username?: string | null
+          display_name?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          ai_tone?: string
+          preferences_json?: Json
+          review_count?: number
+          trust_score?: number
+          onboarded_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          username?: string | null
+          display_name?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          ai_tone?: string
+          preferences_json?: Json
+          review_count?: number
+          trust_score?: number
+          onboarded_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           brand: string

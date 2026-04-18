@@ -71,7 +71,13 @@ function SignInForm() {
     if (error) {
       setError(error.message);
       setLoading(false);
-    } else {
+      return;
+    }
+    try {
+      const res = await fetch('/api/profile');
+      const data = await res.json();
+      router.push(data?.profile?.onboarded_at ? '/' : '/onboarding');
+    } catch {
       router.push('/');
     }
   }
