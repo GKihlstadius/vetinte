@@ -62,15 +62,35 @@ const SUGGESTION_CHIPS = [
   'AirPods Pro 2 vs Sony WF-1000XM5',
 ];
 
+const ROTATING_DEFAULT = ['Hörlurar', 'AirPods', 'Sony XM5', 'Bose QC'];
+
+function useRotatingHeadline(words: string[], intervalMs = 2400): string {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (words.length <= 1) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % words.length), intervalMs);
+    return () => clearInterval(t);
+  }, [words, intervalMs]);
+  return words[idx] ?? words[0] ?? 'Hörlurar';
+}
+
 function Landing({ onStart }: { onStart: (message: string) => void }) {
   const [input, setInput] = useState('');
   const [popular, setPopular] = useState<ProductCardProps[]>([]);
+  const [productNames, setProductNames] = useState<string[]>(ROTATING_DEFAULT);
+  const headline = useRotatingHeadline(productNames);
 
   useEffect(() => {
     fetch('/api/products')
       .then((r) => r.json())
       .then(({ products }) => {
         if (!Array.isArray(products)) return;
+        const names = (products as { brand: string; model: string }[])
+          .map((p) => `${p.brand} ${p.model}`)
+          .filter((n, i, arr) => arr.indexOf(n) === i)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 12);
+        if (names.length > 0) setProductNames(['Hörlurar', ...names]);
         setPopular(
           products.slice(0, 4).map(
             (
@@ -112,7 +132,13 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
           <div className="space-y-5">
             <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 md:text-6xl">
-              Hörlurar som faktiskt passar dig.
+              <span
+                key={headline}
+                className="inline-block animate-fade-in bg-gradient-to-br from-zinc-900 via-deep-700 to-ground-700 bg-clip-text text-transparent"
+              >
+                {headline}
+              </span>{' '}
+              som faktiskt passar dig.
             </h1>
             <p className="text-lg leading-relaxed text-zinc-600 md:text-xl">
               Fråga på svenska eller engelska. Vi kombinerar expertrecensioner och riktiga tester
