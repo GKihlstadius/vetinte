@@ -286,6 +286,16 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
                 <ProductCard key={p.id} {...p} />
               ))}
             </div>
+            {selectedCategory && (
+              <div className="mt-6 text-center">
+                <a
+                  href={`/c/${selectedCategory}`}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-700 transition-colors hover:text-zinc-900"
+                >
+                  Visa alla {CATEGORY_LABELS[selectedCategory] ?? selectedCategory} →
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>
