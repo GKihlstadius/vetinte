@@ -10,7 +10,8 @@
     "test": "vitest run",
     "seed": "tsx scripts/seed-products.ts",
     "seed:affiliate": "tsx scripts/seed-affiliate-links.ts",
-    "ingest": "tsx scripts/ingest.ts"
+    "ingest": "tsx scripts/ingest.ts",
+    "discover": "tsx scripts/discover-from-toplist.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
