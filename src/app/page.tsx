@@ -107,10 +107,11 @@ const CATEGORY_LABELS: Record<string, string> = {
   speakers: 'Högtalare',
   phones: 'Mobiler',
   tv: 'TV',
+  tvs: 'TV',
   monitors: 'Skärmar',
   cameras: 'Kameror',
   makeup: 'Smink',
-  clothing: 'Träningskläder',
+  clothing: 'Kläder',
 };
 
 function categoryKey(path: string): string {
