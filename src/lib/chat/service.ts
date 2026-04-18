@@ -40,6 +40,14 @@ export interface GenerateChatParams {
   userFacts?: string[];
   recentMessages: LLMMessage[];
   locale: 'sv' | 'en';
+  /**
+   * Anonymous browser-side context (recent searches, products viewed, etc.).
+   * Applied to userFacts when no server-side memory is available.
+   */
+  clientContext?: {
+    recent_searches?: string[];
+    recent_products?: { brand: string; model: string; viewed_at: string }[];
+  };
 }
 
 export interface GenerateChatResult {
@@ -51,21 +59,47 @@ export interface GenerateChatResult {
   ragChunksUsed: number;
 }
 
-async function getUserTone(userId: string | null): Promise<'casual' | 'formal' | 'direct' | 'funny'> {
-  if (!userId) return 'casual';
+interface ProfileContext {
+  tone: 'casual' | 'formal' | 'direct' | 'funny';
+  interests: string[];
+  display_name: string | null;
+}
+
+async function getProfileContext(userId: string | null): Promise<ProfileContext> {
+  const fallback: ProfileContext = { tone: 'casual', interests: [], display_name: null };
+  if (!userId) return fallback;
   try {
     const db = createAdminClient();
     const { data } = await db
       .from('profiles')
-      .select('ai_tone')
+      .select('ai_tone, preferences_json, display_name')
       .eq('id', userId)
       .single();
     const t = data?.ai_tone;
-    if (t === 'formal' || t === 'direct' || t === 'funny') return t;
-    return 'casual';
+    const tone =
+      t === 'formal' || t === 'direct' || t === 'funny' ? t : 'casual';
+    const prefs = data?.preferences_json as { interests?: string[] } | null;
+    return {
+      tone,
+      interests: Array.isArray(prefs?.interests) ? prefs.interests : [],
+      display_name: data?.display_name ?? null,
+    };
   } catch {
-    return 'casual';
+    return fallback;
   }
+}
+
+function clientContextToFacts(ctx?: GenerateChatParams['clientContext']): string[] {
+  if (!ctx) return [];
+  const facts: string[] = [];
+  if (ctx.recent_searches && ctx.recent_searches.length > 0) {
+    facts.push(`Senaste sökningar: ${ctx.recent_searches.slice(0, 5).join('; ')}`);
+  }
+  if (ctx.recent_products && ctx.recent_products.length > 0) {
+    const recent = ctx.recent_products.slice(0, 5).map((p) => `${p.brand} ${p.model}`).join(', ');
+    facts.push(`Tittade nyligen på: ${recent}`);
+  }
+  return facts;
 }
 
 export async function generateChatResponse(
@@ -74,16 +108,22 @@ export async function generateChatResponse(
   const start = Date.now();
   const userId = params.userId ?? null;
 
-  const [ragResult, memoryFacts, tone] = await Promise.all([
+  const [ragResult, memoryFacts, profile] = await Promise.all([
     retrieveProductsAndChunks(params.userMessage, 10),
     params.userFacts ? Promise.resolve(params.userFacts) : getMemoryFacts(userId, params.userMessage),
-    getUserTone(userId),
+    getProfileContext(userId),
   ]);
   const { products, chunks } = ragResult;
 
+  const interestFacts = profile.interests.length
+    ? [`Användarens intressen: ${profile.interests.join(', ')}`]
+    : [];
+  const clientFacts = clientContextToFacts(params.clientContext);
+  const allFacts = [...memoryFacts, ...interestFacts, ...clientFacts];
+
   const llm = getLLMProvider();
   const result = await llm.generate({
-    system: buildSystemPrompt({ locale: params.locale, tone }),
+    system: buildSystemPrompt({ locale: params.locale, tone: profile.tone }),
     messages: [
       ...params.recentMessages,
       {
@@ -92,7 +132,7 @@ export async function generateChatResponse(
           userMessage: params.userMessage,
           products,
           chunks,
-          userFacts: memoryFacts,
+          userFacts: allFacts,
           recentMessages: params.recentMessages,
           locale: params.locale,
         }),

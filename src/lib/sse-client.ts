@@ -7,16 +7,22 @@ export interface SSEHandlers {
   onError?: (message: string) => void;
 }
 
+export interface ClientContextPayload {
+  recent_searches?: string[];
+  recent_products?: { brand: string; model: string; viewed_at: string }[];
+}
+
 export async function streamChat(
   message: string,
   locale: 'sv' | 'en',
   handlers: SSEHandlers,
-  sessionId?: string
+  sessionId?: string,
+  clientContext?: ClientContextPayload
 ) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ message, locale, sessionId }),
+    body: JSON.stringify({ message, locale, sessionId, clientContext }),
   });
   if (!res.ok || !res.body) {
     handlers.onError?.('Request failed');

@@ -8,10 +8,33 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
-  const { message, locale, sessionId: clientSessionId } = await req.json();
+  const { message, locale, sessionId: clientSessionId, clientContext } = await req.json();
   if (!message || typeof message !== 'string') {
     return new Response('Message required', { status: 400 });
   }
+  const safeContext = clientContext && typeof clientContext === 'object'
+    ? {
+        recent_searches: Array.isArray(clientContext.recent_searches)
+          ? clientContext.recent_searches.filter((s: unknown): s is string => typeof s === 'string').slice(0, 10)
+          : undefined,
+        recent_products: Array.isArray(clientContext.recent_products)
+          ? clientContext.recent_products
+              .filter(
+                (p: unknown): p is { brand: string; model: string; viewed_at?: string } =>
+                  typeof p === 'object' &&
+                  p !== null &&
+                  typeof (p as { brand?: unknown }).brand === 'string' &&
+                  typeof (p as { model?: unknown }).model === 'string'
+              )
+              .slice(0, 15)
+              .map((p: { brand: string; model: string; viewed_at?: string }) => ({
+                brand: p.brand,
+                model: p.model,
+                viewed_at: p.viewed_at ?? '',
+              }))
+          : undefined,
+      }
+    : undefined;
 
   const supabase = await createServerSupabase();
   const {
@@ -44,6 +67,7 @@ export async function POST(req: NextRequest) {
           userId,
           recentMessages: [],
           locale: locale === 'en' ? 'en' : 'sv',
+          clientContext: safeContext,
         });
 
         for (const ch of result.response.intro_md) write('intro', { token: ch });

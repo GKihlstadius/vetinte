@@ -18,6 +18,7 @@
     "affiliate:auto": "tsx scripts/auto-affiliate-links.ts",
     "summaries:generate": "tsx scripts/generate-summaries.ts",
     "scrape:prisjakt": "tsx scripts/scrape-prisjakt.ts",
+    "scrape:prices": "tsx scripts/scrape-prisjakt-prices.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

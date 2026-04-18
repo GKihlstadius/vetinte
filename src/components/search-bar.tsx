@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
+import { recordSearch } from '@/lib/client-cache';
 
 interface SearchResult {
   slug: string;
@@ -44,6 +45,7 @@ export function SearchBar() {
   }, []);
 
   function go(slug: string) {
+    if (q.trim()) recordSearch(q);
     setOpen(false);
     setQ('');
     router.push(`/p/${slug}`);

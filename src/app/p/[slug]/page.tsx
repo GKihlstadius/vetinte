@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Topnav } from '@/components/topnav';
 import { ReviewsSection } from '@/components/reviews-section';
 import { CommentsSection } from '@/components/comments-section';
+import { RecordProductView } from '@/components/record-product-view';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 interface ProductPageParams {
@@ -96,6 +97,7 @@ export default async function ProductPage({ params }: ProductPageParams) {
 
           <ReviewsSection productId={product.id} />
           <CommentsSection productId={product.id} />
+          <RecordProductView brand={product.brand} model={product.model} />
         </div>
       </section>
     </>

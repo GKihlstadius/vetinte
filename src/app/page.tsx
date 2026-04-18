@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { Topnav } from '@/components/topnav';
 import { ChatView } from '@/components/chat-view';
 import { ProductCard, type ProductCardProps } from '@/components/product-card';
+import { SearchBar } from '@/components/search-bar';
 
 export default function HomePage() {
   const [started, setStarted] = useState(false);
@@ -100,6 +101,8 @@ interface ProductRow {
   image_url: string | null;
   avg_rating?: number;
   review_count?: number;
+  price_from?: number | null;
+  affiliate_link_id?: string | null;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -160,7 +163,7 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
     slug: p.slug,
     brand: p.brand,
     model: p.model,
-    price_from: null,
+    price_from: p.price_from ?? null,
     store_count: 0,
     rating: p.avg_rating && p.avg_rating > 0 ? p.avg_rating : null,
     test_count: p.review_count ?? 0,
@@ -168,7 +171,7 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
     image_url: p.image_url,
     is_winner: i === 0,
     angle: undefined,
-    affiliate_link_id: null,
+    affiliate_link_id: p.affiliate_link_id ?? null,
   }));
 
   return (
@@ -296,6 +299,15 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
             )}
           </div>
         )}
+
+        <div className="mt-20 border-t border-zinc-100 pt-10">
+          <h3 className="mb-3 text-center text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+            Vet du redan vad du letar efter?
+          </h3>
+          <div className="mx-auto flex max-w-md justify-center">
+            <SearchBar />
+          </div>
+        </div>
       </div>
     </section>
   );

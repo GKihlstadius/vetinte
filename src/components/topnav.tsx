@@ -6,7 +6,6 @@ import type { User } from '@supabase/supabase-js';
 import { ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
 import { createBrowserSupabase } from '@/lib/supabase/browser';
 import { HistoryDrawer } from '@/components/history-drawer';
-import { SearchBar } from '@/components/search-bar';
 
 interface TopnavProps {
   onSelectSession?: (sessionId: string) => void;
@@ -88,10 +87,7 @@ export function Topnav({ onSelectSession, onNew }: TopnavProps) {
           >
             Betyget
           </Link>
-          <div className="hidden flex-1 justify-center md:flex">
-            <SearchBar />
-          </div>
-          <div className="flex-1 md:hidden" />
+          <div className="flex-1" />
           {user && onSelectSession && (
             <button
               type="button"

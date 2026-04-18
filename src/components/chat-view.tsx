@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { streamChat } from '@/lib/sse-client';
 import { ProductCard, type ProductCardProps } from '@/components/product-card';
+import { readClientContext, recordSearch } from '@/lib/client-cache';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -30,11 +31,13 @@ export function ChatView({ initialMessage, loadSessionId }: ChatViewProps) {
   async function send(message?: string) {
     const text = (message ?? input).trim();
     if (!text || streaming) return;
+    recordSearch(text);
     const userTurn: Turn = { role: 'user', intro: text, blocks: [], outro: '', followups: [] };
     const botTurn: Turn = { role: 'assistant', intro: '', blocks: [], outro: '', followups: [] };
     setTurns((t) => [...t, userTurn, botTurn]);
     setInput('');
     setStreaming(true);
+    const ctx = readClientContext();
     await streamChat(
       text,
       'sv',
@@ -64,7 +67,8 @@ export function ChatView({ initialMessage, loadSessionId }: ChatViewProps) {
         onDone: () => setStreaming(false),
         onError: () => setStreaming(false),
       },
-      sessionId
+      sessionId,
+      ctx
     );
   }
 
