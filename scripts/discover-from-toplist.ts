@@ -40,6 +40,7 @@ async function main() {
     brand: c.brand,
     model: c.model,
     category: c.category,
+    category_path: `audio/headphones/${c.category}`,
     summary_sv: null,
     summary_en: null,
     specs_json: {},

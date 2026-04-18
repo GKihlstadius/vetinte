@@ -5,9 +5,15 @@ import { createAdminClient } from '@/lib/supabase/admin';
 config({ path: '.env.local' });
 
 async function main() {
-  const data = JSON.parse(readFileSync('seed-data/products.json', 'utf8'));
+  const raw: Record<string, unknown>[] = JSON.parse(
+    readFileSync('seed-data/products.json', 'utf8')
+  );
+  const data = raw.map((row) => ({
+    ...row,
+    category_path: row.category_path ?? `audio/headphones/${row.category}`,
+  }));
   const supabase = createAdminClient();
-  const { error } = await supabase.from('products').upsert(data, { onConflict: 'slug' });
+  const { error } = await supabase.from('products').upsert(data as never, { onConflict: 'slug' });
   if (error) throw error;
   console.log(`Seeded ${data.length} products`);
 }

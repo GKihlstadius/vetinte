@@ -7,6 +7,7 @@ export interface RetrievedProduct {
   brand: string;
   model: string;
   category: string;
+  category_path: string;
   summary_sv: string | null;
   summary_en: string | null;
   specs_json: Record<string, unknown>;

@@ -33,6 +33,7 @@ async function processOne(url: string) {
     brand: c.brand,
     model: c.model,
     category: c.category,
+    category_path: `audio/headphones/${c.category}`,
     summary_sv: null,
     summary_en: null,
     specs_json: {},

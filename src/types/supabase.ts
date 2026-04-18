@@ -289,6 +289,7 @@ export type Database = {
         Row: {
           brand: string
           category: string
+          category_path: string
           created_at: string
           editorial_notes: string | null
           id: string
@@ -303,6 +304,7 @@ export type Database = {
         Insert: {
           brand: string
           category: string
+          category_path: string
           created_at?: string
           editorial_notes?: string | null
           id?: string
@@ -317,6 +319,7 @@ export type Database = {
         Update: {
           brand?: string
           category?: string
+          category_path?: string
           created_at?: string
           editorial_notes?: string | null
           id?: string

@@ -51,21 +51,39 @@ export interface GenerateChatResult {
   ragChunksUsed: number;
 }
 
+async function getUserTone(userId: string | null): Promise<'casual' | 'formal' | 'direct' | 'funny'> {
+  if (!userId) return 'casual';
+  try {
+    const db = createAdminClient();
+    const { data } = await db
+      .from('profiles')
+      .select('ai_tone')
+      .eq('id', userId)
+      .single();
+    const t = data?.ai_tone;
+    if (t === 'formal' || t === 'direct' || t === 'funny') return t;
+    return 'casual';
+  } catch {
+    return 'casual';
+  }
+}
+
 export async function generateChatResponse(
   params: GenerateChatParams
 ): Promise<GenerateChatResult> {
   const start = Date.now();
   const userId = params.userId ?? null;
 
-  const [ragResult, memoryFacts] = await Promise.all([
+  const [ragResult, memoryFacts, tone] = await Promise.all([
     retrieveProductsAndChunks(params.userMessage, 10),
     params.userFacts ? Promise.resolve(params.userFacts) : getMemoryFacts(userId, params.userMessage),
+    getUserTone(userId),
   ]);
   const { products, chunks } = ragResult;
 
   const llm = getLLMProvider();
   const result = await llm.generate({
-    system: buildSystemPrompt({ locale: params.locale }),
+    system: buildSystemPrompt({ locale: params.locale, tone }),
     messages: [
       ...params.recentMessages,
       {
