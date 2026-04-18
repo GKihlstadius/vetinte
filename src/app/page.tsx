@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Topnav } from '@/components/topnav';
 import { ChatView } from '@/components/chat-view';
@@ -90,9 +90,37 @@ function useRotatingHeadline(words: string[], intervalMs = 2400): string {
   return words[idx] ?? words[0] ?? 'Hörlurar';
 }
 
+interface ProductRow {
+  id: string;
+  slug: string;
+  brand: string;
+  model: string;
+  category_path: string;
+  specs_json: Record<string, unknown> | null;
+  image_url: string | null;
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  headphones: 'Hörlurar',
+  laptops: 'Laptops',
+  skincare: 'Hudvård',
+  speakers: 'Högtalare',
+  phones: 'Mobiler',
+  tv: 'TV',
+  monitors: 'Skärmar',
+  cameras: 'Kameror',
+  makeup: 'Smink',
+  clothing: 'Träningskläder',
+};
+
+function categoryKey(path: string): string {
+  return path.split('/')[1] ?? path.split('/')[0] ?? path;
+}
+
 function Landing({ onStart }: { onStart: (message: string) => void }) {
   const [input, setInput] = useState('');
-  const [popular, setPopular] = useState<ProductCardProps[]>([]);
+  const [allProducts, setAllProducts] = useState<ProductRow[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [shuffledCategories] = useState(() =>
     [...ROTATING_CATEGORIES].sort(() => Math.random() - 0.5)
   );
@@ -103,38 +131,42 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
       .then((r) => r.json())
       .then(({ products }) => {
         if (!Array.isArray(products)) return;
-        setPopular(
-          products.slice(0, 4).map(
-            (
-              p: {
-                id: string;
-                slug: string;
-                brand: string;
-                model: string;
-                specs_json: Record<string, unknown> | null;
-                image_url: string | null;
-              },
-              i: number
-            ) => ({
-              id: p.id,
-              slug: p.slug,
-              brand: p.brand,
-              model: p.model,
-              price_from: null,
-              store_count: 0,
-              rating: 4.5 + i * 0.1,
-              test_count: 100 + i * 50,
-              specs: Object.keys(p.specs_json ?? {}).slice(0, 3),
-              image_url: p.image_url,
-              is_winner: i === 0,
-              angle: undefined,
-              affiliate_link_id: null,
-            })
-          )
-        );
+        setAllProducts(products as ProductRow[]);
       })
       .catch(() => {});
   }, []);
+
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of allProducts) {
+      const k = categoryKey(p.category_path);
+      counts.set(k, (counts.get(k) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  }, [allProducts]);
+
+  const filtered = useMemo(() => {
+    const list = selectedCategory
+      ? allProducts.filter((p) => categoryKey(p.category_path) === selectedCategory)
+      : allProducts;
+    return list.slice(0, 4);
+  }, [allProducts, selectedCategory]);
+
+  const popular: ProductCardProps[] = filtered.map((p, i) => ({
+    id: p.id,
+    slug: p.slug,
+    brand: p.brand,
+    model: p.model,
+    price_from: null,
+    store_count: 0,
+    rating: 4.5 + i * 0.1,
+    test_count: 100 + i * 50,
+    specs: Object.keys(p.specs_json ?? {}).slice(0, 3),
+    image_url: p.image_url,
+    is_winner: i === 0,
+    angle: undefined,
+    affiliate_link_id: null,
+  }));
 
   return (
     <section className="relative flex-1 overflow-hidden">
@@ -196,14 +228,56 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
           </div>
         </div>
 
-        {popular.length > 0 && (
+        {allProducts.length > 0 && (
           <div className="mt-24">
-            <div className="mb-6 flex items-baseline justify-between">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                Populära hörlurar nu
+                {selectedCategory
+                  ? `${CATEGORY_LABELS[selectedCategory] ?? selectedCategory} just nu`
+                  : 'Populärt just nu'}
               </h2>
-              <span className="font-mono text-xs text-zinc-400">{popular.length} modeller</span>
+              <span className="font-mono text-xs text-zinc-400">
+                {allProducts.length} produkter totalt
+              </span>
             </div>
+
+            {categoryCounts.length > 1 && (
+              <div className="mb-6 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategory(null)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                    selectedCategory === null
+                      ? 'border-zinc-900 bg-zinc-900 text-white'
+                      : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
+                  }`}
+                >
+                  Alla
+                </button>
+                {categoryCounts.slice(0, 8).map(([key, count]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setSelectedCategory(key)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      selectedCategory === key
+                        ? 'border-zinc-900 bg-zinc-900 text-white'
+                        : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
+                    }`}
+                  >
+                    {CATEGORY_LABELS[key] ?? key}{' '}
+                    <span
+                      className={
+                        selectedCategory === key ? 'text-zinc-300' : 'text-zinc-400'
+                      }
+                    >
+                      ({count})
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {popular.map((p) => (
                 <ProductCard key={p.id} {...p} />

@@ -35,7 +35,7 @@ export function ProductCard(p: ProductCardProps) {
           `${p.brand} ${p.model}`
         )}
       </div>
-      <div className="px-4 py-3">
+      <a href={`/p/${p.slug}`} className="block px-4 py-3 transition-colors hover:bg-zinc-50/50">
         <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
           {p.brand}
         </div>
@@ -56,7 +56,7 @@ export function ProductCard(p: ProductCardProps) {
             </span>
           ))}
         </div>
-      </div>
+      </a>
       <div className="flex items-center justify-between border-t border-zinc-100 bg-zinc-50/50 px-4 py-3">
         <div className="flex flex-col">
           <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-zinc-500">
