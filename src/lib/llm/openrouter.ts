@@ -2,16 +2,19 @@ import OpenAI from 'openai';
 import type { LLMProvider, LLMGenerateParams, LLMResult } from './types';
 
 const FREE_MODELS = [
-  'openai/gpt-oss-120b:free',
-  'qwen/qwen3-next-80b-a3b-instruct:free',
   'z-ai/glm-4.5-air:free',
-  'meta-llama/llama-3.3-70b-instruct:free',
   'nvidia/nemotron-3-super-120b-a12b:free',
+  'openai/gpt-oss-120b:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free',
+  'google/gemma-3-27b-it:free',
 ];
 
-function isUpstreamRateLimit(err: unknown): boolean {
+function shouldTryNext(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
-  return /429|rate.?limit|temporarily|exhaust/i.test(msg);
+  return /429|503|502|504|rate.?limit|temporarily|exhaust|no healthy upstream|Provider returned error/i.test(
+    msg
+  );
 }
 
 export function createOpenRouterProvider(): LLMProvider {
@@ -75,7 +78,7 @@ export function createOpenRouterProvider(): LLMProvider {
           return await tryModel(model, params);
         } catch (e) {
           lastErr = e;
-          if (!isUpstreamRateLimit(e)) throw e;
+          if (!shouldTryNext(e)) throw e;
           console.warn(`OpenRouter ${model} unavailable, trying next`);
         }
       }
@@ -108,7 +111,7 @@ export function createOpenRouterProvider(): LLMProvider {
           return;
         } catch (e) {
           lastErr = e;
-          if (!isUpstreamRateLimit(e)) throw e;
+          if (!shouldTryNext(e)) throw e;
           console.warn(`OpenRouter ${model} unavailable for stream, trying next`);
         }
       }
