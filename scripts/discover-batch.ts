@@ -15,8 +15,12 @@ function slugify(brand: string, model: string): string {
     .replace(/^-|-$/g, '');
 }
 
-async function processOne(url: string) {
-  console.log(`\n=== ${url} ===`);
+function lastSegment(path: string): string {
+  return path.split('/').pop() ?? path;
+}
+
+async function processOne(url: string, pathHint?: string) {
+  console.log(`\n=== ${url}${pathHint ? ` (hint: ${pathHint})` : ''} ===`);
   let html: string;
   try {
     html = await renderPage(url, { forceCF: true });
@@ -24,7 +28,7 @@ async function processOne(url: string) {
     console.log('CF failed, trying direct fetch...');
     html = await renderPage(url);
   }
-  const candidates = await extractCandidates(html);
+  const candidates = await extractCandidates(html, { pathHint });
   console.log(`Found ${candidates.length} candidates.`);
   if (candidates.length === 0) return { url, inserted: 0 };
 
@@ -32,8 +36,8 @@ async function processOne(url: string) {
     slug: slugify(c.brand, c.model),
     brand: c.brand,
     model: c.model,
-    category: c.category,
-    category_path: `audio/headphones/${c.category}`,
+    category: lastSegment(c.category_path),
+    category_path: c.category_path,
     summary_sv: null,
     summary_en: null,
     specs_json: {},
@@ -52,13 +56,28 @@ async function processOne(url: string) {
   return { url, inserted: rows.length };
 }
 
+interface JobInput {
+  urls: string[];
+  pathHint?: string;
+}
+
+function parseFile(file: string): JobInput {
+  const raw: unknown = JSON.parse(readFileSync(file, 'utf8'));
+  if (Array.isArray(raw)) return { urls: raw as string[] };
+  const obj = raw as { urls?: string[]; pathHint?: string };
+  return { urls: obj.urls ?? [], pathHint: obj.pathHint };
+}
+
 async function main() {
   const file = process.argv[2] ?? 'seed-data/discover-urls.json';
-  const urls: string[] = JSON.parse(readFileSync(file, 'utf8'));
+  const cliHint = process.argv[3];
+  const job = parseFile(file);
+  const pathHint = cliHint ?? job.pathHint;
+
   const results: { url: string; inserted: number; error?: string }[] = [];
-  for (const url of urls) {
+  for (const url of job.urls) {
     try {
-      results.push(await processOne(url));
+      results.push(await processOne(url, pathHint));
     } catch (e) {
       console.error(`Failed ${url}:`, (e as Error).message);
       results.push({ url, inserted: 0, error: (e as Error).message });

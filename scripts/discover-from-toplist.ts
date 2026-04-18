@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { writeFileSync } from 'node:fs';
 import { renderPage } from '@/lib/scraper/cloudflare';
-import { extractCandidates, type ProductCandidate } from '@/lib/discovery/extract';
+import { extractCandidates } from '@/lib/discovery/extract';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 config({ path: '.env.local' });
@@ -15,11 +15,16 @@ function slugify(brand: string, model: string): string {
     .replace(/^-|-$/g, '');
 }
 
+function lastSegment(path: string): string {
+  return path.split('/').pop() ?? path;
+}
+
 async function main() {
   const url = process.argv[2];
   const mode = process.argv[3] ?? 'dry-run';
+  const pathHint = process.argv[4];
   if (!url) {
-    console.error('Usage: npm run discover -- <url> [dry-run|insert]');
+    console.error('Usage: npm run discover -- <url> [dry-run|insert] [pathHint]');
     process.exit(1);
   }
 
@@ -27,10 +32,10 @@ async function main() {
   const html = await renderPage(url, { forceCF: true });
   console.log(`Got ${html.length} bytes. Extracting candidates via LLM...`);
 
-  const candidates = await extractCandidates(html);
+  const candidates = await extractCandidates(html, { pathHint });
   console.log(`Found ${candidates.length} candidates:`);
   for (const c of candidates) {
-    console.log(`  - ${c.brand} ${c.model} (${c.category}) — ${c.angle ?? ''}`);
+    console.log(`  - ${c.brand} ${c.model} (${c.category_path}) — ${c.angle ?? ''}`);
   }
 
   if (candidates.length === 0) return;
@@ -39,8 +44,8 @@ async function main() {
     slug: slugify(c.brand, c.model),
     brand: c.brand,
     model: c.model,
-    category: c.category,
-    category_path: `audio/headphones/${c.category}`,
+    category: lastSegment(c.category_path),
+    category_path: c.category_path,
     summary_sv: null,
     summary_en: null,
     specs_json: {},
