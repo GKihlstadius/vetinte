@@ -171,10 +171,16 @@ export function ReviewsSection({ productId }: { productId: string }) {
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-zinc-900">
-                    {r.author?.display_name ||
-                      (r.author?.username ? `@${r.author.username}` : 'Anonym')}
-                  </div>
+                  {r.author?.username ? (
+                    <Link
+                      href={`/u/${r.author.username}`}
+                      className="text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-700"
+                    >
+                      {r.author.display_name || `@${r.author.username}`}
+                    </Link>
+                  ) : (
+                    <div className="text-sm font-medium text-zinc-500">Anonym</div>
+                  )}
                   <div className="font-mono text-[11px] text-zinc-500">
                     {new Date(r.created_at).toLocaleDateString('sv-SE')}
                   </div>

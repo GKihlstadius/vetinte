@@ -40,10 +40,11 @@ export function ProductCard(p: ProductCardProps) {
           {p.brand}
         </div>
         <div className="text-base font-semibold tracking-tight text-zinc-900">{p.model}</div>
-        {p.rating !== null && (
+        {p.rating !== null && p.test_count > 0 && (
           <div className="mt-1.5 text-xs text-zinc-600">
             <span className="text-ground-600">{'★'.repeat(Math.round(p.rating))}</span>{' '}
-            {p.rating.toFixed(1)} · {p.test_count} tester
+            {p.rating.toFixed(1)} · {p.test_count}{' '}
+            {p.test_count === 1 ? 'recension' : 'recensioner'}
           </div>
         )}
         <div className="mt-3 flex flex-wrap gap-1.5">

@@ -98,6 +98,8 @@ interface ProductRow {
   category_path: string;
   specs_json: Record<string, unknown> | null;
   image_url: string | null;
+  avg_rating?: number;
+  review_count?: number;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -160,8 +162,8 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
     model: p.model,
     price_from: null,
     store_count: 0,
-    rating: 4.5 + i * 0.1,
-    test_count: 100 + i * 50,
+    rating: p.avg_rating && p.avg_rating > 0 ? p.avg_rating : null,
+    test_count: p.review_count ?? 0,
     specs: Object.keys(p.specs_json ?? {}).slice(0, 3),
     image_url: p.image_url,
     is_winner: i === 0,
