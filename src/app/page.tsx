@@ -62,7 +62,23 @@ const SUGGESTION_CHIPS = [
   'AirPods Pro 2 vs Sony WF-1000XM5',
 ];
 
-const ROTATING_DEFAULT = ['Hörlurar', 'AirPods', 'Sony XM5', 'Bose QC'];
+const ROTATING_CATEGORIES = [
+  'Hörlurar',
+  'Laptop',
+  'Foundation',
+  'TV',
+  'Serum',
+  'Mobil',
+  'Smartwatch',
+  'Sneakers',
+  'Kamera',
+  'Mascara',
+  'Gymtights',
+  'Högtalare',
+  'Hudkräm',
+  'Klocka',
+  'Surfplatta',
+];
 
 function useRotatingHeadline(words: string[], intervalMs = 2400): string {
   const [idx, setIdx] = useState(0);
@@ -77,20 +93,16 @@ function useRotatingHeadline(words: string[], intervalMs = 2400): string {
 function Landing({ onStart }: { onStart: (message: string) => void }) {
   const [input, setInput] = useState('');
   const [popular, setPopular] = useState<ProductCardProps[]>([]);
-  const [productNames, setProductNames] = useState<string[]>(ROTATING_DEFAULT);
-  const headline = useRotatingHeadline(productNames);
+  const [shuffledCategories] = useState(() =>
+    [...ROTATING_CATEGORIES].sort(() => Math.random() - 0.5)
+  );
+  const headline = useRotatingHeadline(shuffledCategories);
 
   useEffect(() => {
     fetch('/api/products')
       .then((r) => r.json())
       .then(({ products }) => {
         if (!Array.isArray(products)) return;
-        const names = (products as { brand: string; model: string }[])
-          .map((p) => `${p.brand} ${p.model}`)
-          .filter((n, i, arr) => arr.indexOf(n) === i)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 12);
-        if (names.length > 0) setProductNames(['Hörlurar', ...names]);
         setPopular(
           products.slice(0, 4).map(
             (
