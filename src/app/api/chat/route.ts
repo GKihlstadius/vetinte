@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { generateChatResponse } from '@/lib/chat/service';
 import { ensureSession, saveTurn } from '@/lib/chat/persist';
 import { createServerSupabase } from '@/lib/supabase/server';
+import { chatGuestLimit, chatUserLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -17,6 +18,12 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
   const userId = user?.id ?? null;
+
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+  const limiter = userId ? chatUserLimit : chatGuestLimit;
+  const limitKey = userId ?? ip;
+  const { success, reset } = await limiter.limit(limitKey);
+  if (!success) return rateLimitResponse(reset);
 
   const sessionId = await ensureSession(userId, clientSessionId ?? null, message);
 

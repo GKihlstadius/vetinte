@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createServerSupabase } from '@/lib/supabase/server';
+import { goIpLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -14,6 +15,10 @@ export async function GET(
   ctx: { params: Promise<{ link_id: string }> }
 ) {
   const { link_id } = await ctx.params;
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+  const { success, reset } = await goIpLimit.limit(ip);
+  if (!success) return rateLimitResponse(reset);
+
   const admin = createAdminClient();
   const { data: link } = await admin
     .from('affiliate_links')
@@ -26,7 +31,6 @@ export async function GET(
   const {
     data: { user },
   } = await server.auth.getUser();
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || '0.0.0.0';
   const ipHash = createHash('sha256').update(ip + dailySalt()).digest('hex').slice(0, 32);
 
   await admin.from('affiliate_clicks').insert({
