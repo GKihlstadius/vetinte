@@ -103,29 +103,33 @@ export async function generateChatResponse(
     maxTokens: 8192,
   });
 
-  const parsed = result.parsed as ChatResponse | undefined;
+  const parsed = (result.parsed ?? {}) as Partial<ChatResponse>;
   const region = params.locale === 'sv' ? 'SE' : 'EN';
-  const enrichedBlocks: ChatBlock[] = parsed
-    ? await Promise.all(
-        (parsed.blocks ?? []).map(async (b): Promise<ChatBlock> => {
-          if (b.type === 'product_card') {
-            const link = await resolvePrimaryLink(b.product_id, region);
-            return { ...b, affiliate_link_id: link?.id };
-          }
-          if (b.type === 'comparison_table') {
-            const links = await Promise.all(
-              b.product_ids.map((slug) => resolvePrimaryLink(slug, region))
-            );
-            return { ...b, affiliate_link_ids: links.map((l) => l?.id ?? '') };
-          }
-          return b;
-        })
-      )
-    : [];
+  const rawBlocks = Array.isArray(parsed.blocks) ? parsed.blocks : [];
+  const enrichedBlocks: ChatBlock[] = await Promise.all(
+    rawBlocks.map(async (b): Promise<ChatBlock> => {
+      if (b.type === 'product_card' && b.product_id) {
+        const link = await resolvePrimaryLink(b.product_id, region);
+        return { ...b, affiliate_link_id: link?.id };
+      }
+      if (b.type === 'comparison_table' && Array.isArray(b.product_ids)) {
+        const links = await Promise.all(
+          b.product_ids.map((slug) => resolvePrimaryLink(slug, region))
+        );
+        return { ...b, affiliate_link_ids: links.map((l) => l?.id ?? '') };
+      }
+      return b;
+    })
+  );
 
-  const enrichedResponse: ChatResponse = parsed
-    ? { ...parsed, blocks: enrichedBlocks }
-    : ({ intro_md: '', blocks: [], outro_md: '', followup_suggestions: [] } as ChatResponse);
+  const enrichedResponse: ChatResponse = {
+    intro_md: typeof parsed.intro_md === 'string' ? parsed.intro_md : '',
+    blocks: enrichedBlocks,
+    outro_md: typeof parsed.outro_md === 'string' ? parsed.outro_md : '',
+    followup_suggestions: Array.isArray(parsed.followup_suggestions)
+      ? parsed.followup_suggestions.filter((s): s is string => typeof s === 'string')
+      : [],
+  };
 
   if (userId) {
     const assistantText = [enrichedResponse.intro_md, enrichedResponse.outro_md]
