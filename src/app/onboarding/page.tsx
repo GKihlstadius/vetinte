@@ -127,8 +127,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <section className="relative flex-1 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.08),transparent_55%)]" />
+    <section className="relative flex-1">
       <div className="relative mx-auto max-w-2xl px-6 py-12">
         <div className="mb-8 flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600 backdrop-blur">

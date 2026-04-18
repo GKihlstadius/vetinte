@@ -83,9 +83,7 @@ function SignInForm() {
   }
 
   return (
-    <section className="relative flex-1 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.08),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,0.06),transparent_40%)]" />
+    <section className="relative flex-1">
       <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center px-6 py-12">
         <Link
           href="/"

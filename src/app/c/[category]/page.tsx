@@ -92,8 +92,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   return (
     <>
       <Topnav />
-      <section className="relative flex-1 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.05),transparent_55%)]" />
+      <section className="relative flex-1">
         <div className="relative mx-auto max-w-6xl px-6 py-10">
           <Link
             href="/"

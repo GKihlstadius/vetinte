@@ -67,8 +67,7 @@ export default function ProfilePage() {
     .slice(0, 2);
 
   return (
-    <section className="relative flex-1 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.06),transparent_55%)]" />
+    <section className="relative flex-1">
       <div className="relative mx-auto max-w-3xl px-6 py-12">
         <div className="flex items-start gap-6">
           <div className="h-24 w-24 shrink-0 overflow-hidden rounded-full border border-zinc-200 bg-zinc-100">

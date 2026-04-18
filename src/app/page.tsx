@@ -172,9 +172,7 @@ function Landing({ onStart }: { onStart: (message: string) => void }) {
   }));
 
   return (
-    <section className="relative flex-1 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.08),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,0.06),transparent_40%)]" />
+    <section className="relative flex-1">
       <div className="relative mx-auto max-w-5xl px-6 py-20 md:py-28">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
           <div className="space-y-5">
