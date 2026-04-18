@@ -138,16 +138,17 @@ export async function generateChatResponse(
     gemini: 'gemini-flash-latest',
     groq: 'llama-3.3-70b-versatile',
   };
-  const modelName = modelByProvider[llm.name] ?? llm.name;
+  const actualProvider = result.provider ?? llm.name;
+  const modelName = modelByProvider[actualProvider] ?? actualProvider;
 
-  trackUsage(llm.name, modelName, result.usage).catch(() => {});
+  trackUsage(actualProvider, modelName, result.usage).catch(() => {});
   logLongTailMiss(userId, params.userMessage, chunks).catch(() => {});
 
   return {
     response: enrichedResponse,
     usage: result.usage,
-    provider: llm.name,
-    model: modelByProvider[llm.name] ?? llm.name,
+    provider: actualProvider,
+    model: modelName,
     latencyMs: Date.now() - start,
     ragChunksUsed: chunks.length,
   };

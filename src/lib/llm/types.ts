@@ -28,6 +28,7 @@ export interface LLMResult {
   parsed?: unknown;
   toolCalls?: { name: string; args: unknown }[];
   usage: LLMUsage;
+  provider?: string;
 }
 
 export interface LLMProvider {
