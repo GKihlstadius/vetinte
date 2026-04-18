@@ -134,6 +134,8 @@ function EditModal({
   const [summaryEn, setSummaryEn] = useState(product.summary_en ?? '');
   const [notes, setNotes] = useState(product.editorial_notes ?? '');
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
 
   async function save() {
     setSaving(true);
@@ -148,6 +150,24 @@ function EditModal({
     });
     setSaving(false);
     onSaved();
+  }
+
+  async function generateAi() {
+    setGenerating(true);
+    setGenError(null);
+    try {
+      const res = await fetch(
+        `/api/admin/products/${product.id}/generate-summary`,
+        { method: 'POST' }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'fel');
+      setSummarySv(data.summary_sv);
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : 'fel');
+    } finally {
+      setGenerating(false);
+    }
   }
 
   return (
@@ -170,6 +190,17 @@ function EditModal({
               rows={3}
               className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm"
             />
+            <div className="mt-1.5 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={generateAi}
+                disabled={generating}
+                className="text-xs font-medium text-zinc-700 underline underline-offset-2 hover:text-zinc-900 disabled:opacity-50"
+              >
+                {generating ? 'Genererar...' : 'Generera med AI baserat på data'}
+              </button>
+              {genError && <span className="text-xs text-red-600">{genError}</span>}
+            </div>
           </Field>
           <Field label="Summary EN">
             <textarea

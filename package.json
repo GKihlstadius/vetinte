@@ -16,6 +16,7 @@
     "embed:products": "tsx scripts/embed-products.ts",
     "images:fetch": "tsx scripts/fetch-product-images.ts",
     "affiliate:auto": "tsx scripts/auto-affiliate-links.ts",
+    "summaries:generate": "tsx scripts/generate-summaries.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
