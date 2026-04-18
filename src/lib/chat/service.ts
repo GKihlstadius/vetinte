@@ -137,6 +137,7 @@ export async function generateChatResponse(
   const modelByProvider: Record<string, string> = {
     gemini: 'gemini-flash-latest',
     groq: 'llama-3.3-70b-versatile',
+    openrouter: 'meta-llama/llama-3.3-70b-instruct:free',
   };
   const actualProvider = result.provider ?? llm.name;
   const modelName = modelByProvider[actualProvider] ?? actualProvider;
