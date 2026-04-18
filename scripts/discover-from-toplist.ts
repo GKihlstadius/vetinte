@@ -46,10 +46,6 @@ async function main() {
     model: c.model,
     category: lastSegment(c.category_path),
     category_path: c.category_path,
-    summary_sv: null,
-    summary_en: null,
-    specs_json: {},
-    image_url: null,
     editorial_notes: c.angle,
   }));
 
@@ -59,6 +55,7 @@ async function main() {
   if (mode === 'insert') {
     const supabase = createAdminClient();
     const { error } = await supabase.from('products').upsert(rows as unknown as never[], {
+      ignoreDuplicates: true,
       onConflict: 'slug',
     });
     if (error) throw error;

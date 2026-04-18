@@ -38,16 +38,14 @@ async function processOne(url: string, pathHint?: string) {
     model: c.model,
     category: lastSegment(c.category_path),
     category_path: c.category_path,
-    summary_sv: null,
-    summary_en: null,
-    specs_json: {},
-    image_url: null,
     editorial_notes: c.angle,
   }));
 
   const supabase = createAdminClient();
+  // ignoreDuplicates so existing summaries/specs/images are preserved
   const { error } = await supabase.from('products').upsert(rows as unknown as never[], {
     onConflict: 'slug',
+    ignoreDuplicates: true,
   });
   if (error) {
     console.error(`Insert failed: ${error.message}`);

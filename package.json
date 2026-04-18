@@ -13,7 +13,9 @@
     "ingest": "tsx scripts/ingest.ts",
     "discover": "tsx scripts/discover-from-toplist.ts",
     "discover:batch": "tsx scripts/discover-batch.ts",
-    "embed:products": "tsx scripts/embed-products.ts"
+    "embed:products": "tsx scripts/embed-products.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
