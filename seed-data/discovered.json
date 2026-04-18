@@ -1,0 +1,145 @@
+[
+  {
+    "slug": "akg-n700",
+    "brand": "AKG",
+    "model": "N700",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "brusreducerande hörlurar med lyxkänsla"
+  },
+  {
+    "slug": "apple-airpods-max",
+    "brand": "Apple",
+    "model": "Airpods Max",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "maffiga over ear-hörlurar"
+  },
+  {
+    "slug": "bang-olufsen-beoplay-h95",
+    "brand": "Bang & Olufsen",
+    "model": "Beoplay H95",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "snygga och välljudande dyrgripar"
+  },
+  {
+    "slug": "bose-nc-headphones-700",
+    "brand": "Bose",
+    "model": "NC Headphones 700",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "en ljudmässig fullträff"
+  },
+  {
+    "slug": "bowers-wilkins-px7",
+    "brand": "Bowers & Wilkins",
+    "model": "PX7",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "over ear-hörlurar med fantastiskt ljud"
+  },
+  {
+    "slug": "jbl-live-650btnc",
+    "brand": "JBL",
+    "model": "Live 650BTNC",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "välljudande och bekväma brusreducerande hörlurar"
+  },
+  {
+    "slug": "jbl-tour-one-m2",
+    "brand": "JBL",
+    "model": "Tour One M2",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "bekväma hörlurar med bra ljud"
+  },
+  {
+    "slug": "marshall-monitor-ii-anc",
+    "brand": "Marshall",
+    "model": "Monitor II ANC",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "ikoniska rockhörlurar övertygar"
+  },
+  {
+    "slug": "philips-fidelio-l3",
+    "brand": "Philips",
+    "model": "Fidelio L3",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "utmärkt ljud och bra brusreducering"
+  },
+  {
+    "slug": "sennheiser-momentum-4",
+    "brand": "Sennheiser",
+    "model": "Momentum 4",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "efterlängtad uppföljare levererar"
+  },
+  {
+    "slug": "shure-aonic-50",
+    "brand": "Shure",
+    "model": "Aonic 50",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "välljudande trådlösa hörlurar med aktiv brusreducering"
+  },
+  {
+    "slug": "sony-wh-1000xm5",
+    "brand": "Sony",
+    "model": "WH-1000XM5",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "brusreducering i världsklass"
+  },
+  {
+    "slug": "sony-wh-xb910n",
+    "brand": "Sony",
+    "model": "WH-XB910N",
+    "category": "over-ear",
+    "summary_sv": null,
+    "summary_en": null,
+    "specs_json": {},
+    "image_url": null,
+    "editorial_notes": "on ear-hörlurar med mycket bra ljud – och pris"
+  }
+]

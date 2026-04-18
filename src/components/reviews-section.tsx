@@ -5,11 +5,14 @@ import Link from 'next/link';
 import { Star, StarOff } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import { createBrowserSupabase } from '@/lib/supabase/browser';
+import { LevelBadge } from '@/components/level-badge';
 
 interface ReviewAuthor {
   username: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  review_count: number;
+  trust_score: number;
 }
 
 interface Review {
@@ -171,16 +174,24 @@ export function ReviewsSection({ productId }: { productId: string }) {
                   )}
                 </div>
                 <div className="flex-1">
-                  {r.author?.username ? (
-                    <Link
-                      href={`/u/${r.author.username}`}
-                      className="text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-700"
-                    >
-                      {r.author.display_name || `@${r.author.username}`}
-                    </Link>
-                  ) : (
-                    <div className="text-sm font-medium text-zinc-500">Anonym</div>
-                  )}
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    {r.author?.username ? (
+                      <Link
+                        href={`/u/${r.author.username}`}
+                        className="text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-700"
+                      >
+                        {r.author.display_name || `@${r.author.username}`}
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-medium text-zinc-500">Anonym</span>
+                    )}
+                    {r.author && (
+                      <LevelBadge
+                        reviewCount={r.author.review_count}
+                        trustScore={r.author.trust_score}
+                      />
+                    )}
+                  </div>
                   <div className="font-mono text-[11px] text-zinc-500">
                     {new Date(r.created_at).toLocaleDateString('sv-SE')}
                   </div>

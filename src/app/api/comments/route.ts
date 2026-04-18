@@ -6,24 +6,18 @@ export async function GET(req: NextRequest) {
   const productId = req.nextUrl.searchParams.get('product_id');
   if (!productId) return Response.json({ error: 'product_id required' }, { status: 400 });
   const admin = createAdminClient();
-  const { data: reviews } = await admin
-    .from('user_reviews')
-    .select('id, rating, body, created_at, user_id')
+  const { data: comments } = await admin
+    .from('product_comments')
+    .select('id, body, created_at, user_id, parent_id')
     .eq('product_id', productId)
     .eq('status', 'approved')
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(100);
 
-  const userIds = [...new Set((reviews ?? []).map((r) => r.user_id))];
+  const userIds = [...new Set((comments ?? []).map((c) => c.user_id))];
   let profiles: Record<
     string,
-    {
-      username: string | null;
-      display_name: string | null;
-      avatar_url: string | null;
-      review_count: number;
-      trust_score: number;
-    }
+    { username: string | null; display_name: string | null; avatar_url: string | null; review_count: number; trust_score: number }
   > = {};
   if (userIds.length > 0) {
     const { data } = await admin
@@ -44,14 +38,14 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const enriched = (reviews ?? []).map((r) => ({
-    id: r.id,
-    rating: r.rating,
-    body: r.body,
-    created_at: r.created_at,
-    author: profiles[r.user_id] ?? null,
+  const enriched = (comments ?? []).map((c) => ({
+    id: c.id,
+    body: c.body,
+    parent_id: c.parent_id,
+    created_at: c.created_at,
+    author: profiles[c.user_id] ?? null,
   }));
-  return Response.json({ reviews: enriched });
+  return Response.json({ comments: enriched });
 }
 
 export async function POST(req: NextRequest) {
@@ -63,9 +57,9 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const productId = body.product_id;
-  const rating = Number(body.rating);
-  const reviewBody = typeof body.body === 'string' ? body.body.trim().slice(0, 2000) : null;
-  if (!productId || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+  const text = typeof body.body === 'string' ? body.body.trim().slice(0, 1000) : '';
+  const parentId = typeof body.parent_id === 'string' ? body.parent_id : null;
+  if (!productId || text.length < 1) {
     return Response.json({ error: 'invalid input' }, { status: 400 });
   }
 
@@ -75,25 +69,20 @@ export async function POST(req: NextRequest) {
     .select('review_count, trust_score')
     .eq('id', user.id)
     .single();
-  // Auto-approve once user is trusted (3+ approved reviews or trust_score >= 25)
   const trusted = (profile?.review_count ?? 0) >= 3 || (profile?.trust_score ?? 0) >= 25;
   const status = trusted ? 'approved' : 'pending';
 
   const { data, error } = await admin
-    .from('user_reviews')
-    .upsert(
-      {
-        user_id: user.id,
-        product_id: productId,
-        rating,
-        body: reviewBody,
-        status,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id,product_id' }
-    )
+    .from('product_comments')
+    .insert({
+      user_id: user.id,
+      product_id: productId,
+      body: text,
+      parent_id: parentId,
+      status,
+    })
     .select('*')
     .single();
   if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ review: data, status });
+  return Response.json({ comment: data, status });
 }

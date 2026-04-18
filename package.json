@@ -17,6 +17,7 @@
     "images:fetch": "tsx scripts/fetch-product-images.ts",
     "affiliate:auto": "tsx scripts/auto-affiliate-links.ts",
     "summaries:generate": "tsx scripts/generate-summaries.ts",
+    "scrape:prisjakt": "tsx scripts/scrape-prisjakt.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

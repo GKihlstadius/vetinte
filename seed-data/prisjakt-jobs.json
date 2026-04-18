@@ -1,0 +1,10 @@
+[
+  { "url": "https://www.prisjakt.nu/c/horlurar", "category_path": "audio/headphones", "pages": 4 },
+  { "url": "https://www.prisjakt.nu/c/mobiltelefoner", "category_path": "tech/phones", "pages": 4 },
+  { "url": "https://www.prisjakt.nu/c/laptops", "category_path": "tech/laptops", "pages": 3 },
+  { "url": "https://www.prisjakt.nu/c/tv-apparater", "category_path": "tech/tv", "pages": 3 },
+  { "url": "https://www.prisjakt.nu/c/smartklockor", "category_path": "tech/smartwatches", "pages": 3 },
+  { "url": "https://www.prisjakt.nu/c/hogtalare", "category_path": "audio/speakers", "pages": 2 },
+  { "url": "https://www.prisjakt.nu/c/kameror", "category_path": "tech/cameras", "pages": 2 },
+  { "url": "https://www.prisjakt.nu/c/datorskarmar", "category_path": "tech/monitors", "pages": 2 }
+]

@@ -50,8 +50,18 @@ export default function AdminPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Admin</h1>
-      <p className="mt-1 text-sm text-zinc-500">Produkter och innehåll</p>
+      <div className="flex items-baseline justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Admin</h1>
+          <p className="mt-1 text-sm text-zinc-500">Produkter och innehåll</p>
+        </div>
+        <a
+          href="/admin/moderation"
+          className="text-sm font-medium text-zinc-700 underline underline-offset-2 hover:text-zinc-900"
+        >
+          Moderation →
+        </a>
+      </div>
 
       <div className="mt-8 overflow-hidden rounded-xl border border-zinc-200 bg-white">
         <table className="w-full text-sm">

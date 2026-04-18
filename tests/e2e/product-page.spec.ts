@@ -16,9 +16,7 @@ test.describe('product page', () => {
 
   test('shows sign-in prompt when not authenticated', async ({ page }) => {
     await page.goto('/p/sony-wh-1000xm5');
-    await expect(
-      page.getByText('Logga in', { exact: false })
-    ).toBeVisible();
+    await expect(page.getByText('Logga in', { exact: false }).first()).toBeVisible();
   });
 
   test('back link returns to home', async ({ page }) => {
